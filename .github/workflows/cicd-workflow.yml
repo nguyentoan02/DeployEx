@@ -26,21 +26,25 @@ jobs:
     steps:
       - name: Ensure Docker & Docker Compose are installed
         run: |
-          sudo apt update
-          sudo apt install -y docker.io docker-compose
           sudo systemctl start docker
           sudo systemctl enable docker
+          docker-compose version || sudo apt-get install -y docker-compose
 
-      - name: Pull latest Docker image
-        run: sudo docker pull ${{ secrets.DOCKER_USERNAME }}/testcrud:latest
+      - name: Checkout source code
+        uses: actions/checkout@v3
 
-      - name: Stop and remove old containers
-        run: sudo docker-compose down || true
+      - name: Pull latest image from Docker Hub
+        run: docker pull ${{ secrets.DOCKER_USERNAME }}/testcrud:latest
 
-      - name: Create `.env` file
+      - name: Create .env file
         run: |
           echo "MONGO_URI=${{ secrets.MONGO_URI }}" > .env
-          echo "PORT=3000" >> .env
+          echo "PORT=${{ secrets.PORT }}" >> .env
+
+      - name: Stop and remove old containers
+        run: |
+          sudo docker-compose down || true
 
       - name: Start services with Docker Compose
-        run: sudo docker-compose up -d --force-recreate
+        run: |
+          sudo docker-compose up -d --force-recreate --build
