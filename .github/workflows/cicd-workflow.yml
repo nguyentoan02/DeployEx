@@ -36,7 +36,7 @@ jobs:
         run: sudo usermod -aG docker $(whoami)
 
       - name: Pull latest image from Docker Hub
-        run: docker pull ${{ secrets.DOCKER_USERNAME }}/testcrud:latest
+        run: sudo docker pull ${{ secrets.DOCKER_USERNAME }}/testcrud:latest
 
       - name: Create .env file
         run: |
